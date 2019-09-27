@@ -6,36 +6,26 @@
 package com.mycompany.ecies;
 
 import djb.Curve25519;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.util.Arrays;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-//import org.whispersystems.curve25519.Curve25519;
-//import org.whispersystems.curve25519.Curve25519KeyPair;
 
 /**
  *
  * @author sjdonado
  */
 public class EllipticCurve {
-//    Curve25519 curve;
-    final int KEY_SIZE = 32;
-    SecureRandom random;
+    ECIES ecies;
     
-    public EllipticCurve() {
-        Security.addProvider(new BouncyCastleProvider());
-//        this.curve = Curve25519.getInstance(Curve25519.BEST);
-        this.random = new SecureRandom();
+    public EllipticCurve(ECIES ecies) {
+        this.ecies = ecies;
     }
     
     /**
     *
-    * @return { byte[] privateKey, byte[] publicKey } byte[][]
+    * @return byte[][]{ byte[] privateKey, byte[] publicKey }
     */
     public byte[][] generateKeyPair() {
-        byte[] privateKey = new byte[KEY_SIZE];
-        random.nextBytes(privateKey);
-        byte[] publicKey = new byte[KEY_SIZE];
+        byte[] privateKey = new byte[ecies.getKeySize()];
+//        ECIES...nextBytes(privateKey);
+        byte[] publicKey = new byte[ecies.getKeySize()];
         Curve25519.keygen(publicKey, null, privateKey);
         
         return new byte[][]{ privateKey, publicKey };
@@ -43,21 +33,11 @@ public class EllipticCurve {
     
     /**
     *
-    * @return randomNumber byte[]
-    */
-    public byte[] getRandomNumber() {
-        byte[] r = new byte[KEY_SIZE];
-        random.nextBytes(r);
-        return r;
-    }
-    
-    /**
-    *
     * @param r byte[]
-    * @return R byte[]
+    * @return byte[]
     */
     public byte[] generateR(byte[] r) {
-        byte[] R = new byte[KEY_SIZE];
+        byte[] R = new byte[ecies.getKeySize()];
         Curve25519.curve(R, r, null);
         return R;
     }
@@ -66,10 +46,10 @@ public class EllipticCurve {
     *
     * @param publickey byte[]
     * @param privateKey byte[]
-    * @return Z byte[]
+    * @return byte[]
     */
     public byte[] getSharedKey(byte[] publickey, byte[] privateKey) {
-        byte[] Z = new byte[KEY_SIZE];
+        byte[] Z = new byte[ecies.getKeySize()];
         Curve25519.curve(Z, privateKey, publickey);
         return Z;
     }

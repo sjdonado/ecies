@@ -14,20 +14,29 @@ import org.bouncycastle.util.encoders.Hex;
 public class Main {
     
     public static void main(String[] args) {
-        EllipticCurve ellipticCurve = new EllipticCurve();
-        byte[][] keyPair = ellipticCurve.generateKeyPair();
-        byte[] randomNumber = ellipticCurve.getRandomNumber();
-        byte[] R = ellipticCurve.generateR(randomNumber);
-        byte[] sharedSecret = ellipticCurve.getSharedKey(keyPair[0], keyPair[1]);
+        ECIES ecies = new ECIES();
+        EllipticCurve ellipticCurve = new EllipticCurve(ecies);
         
-        System.out.println("Private key: " + Hex.toHexString(keyPair[0]));
-        System.out.println("Public key: " + Hex.toHexString(keyPair[1]));
-        System.out.println("r: " + Hex.toHexString(randomNumber));
-        System.out.println("R: " + Hex.toHexString(R));
+        byte[][] recipientKeyPairs = ellipticCurve.generateKeyPair();
+
+        System.out.println("**** RECIPIENT ****");
+        System.out.println("private key: " + Hex.toHexString(recipientKeyPairs[0]));
+        System.out.println("public key: " + Hex.toHexString(recipientKeyPairs[1]));
+
+        byte[][] senderKeyPairs = ellipticCurve.generateKeyPair();
+        byte[] IV = ecies.getRandomNumber();
+        byte[] sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
+                senderKeyPairs[1]);
+//        byte[] randomNumber = ellipticCurve.getRandomNumber();
+//        byte[] R = ellipticCurve.generateR(randomNumber);
+
+        System.out.println("**** SENDER ****");
+        System.out.println("private key: " + Hex.toHexString(senderKeyPairs[0]));
+        System.out.println("public key: " + Hex.toHexString(senderKeyPairs[1]));
+        System.out.println("IV: " + Hex.toHexString(IV));
         System.out.println("sharedSecret: " + Hex.toHexString(sharedSecret));
+//        System.out.println("r: " + Hex.toHexString(randomNumber));
+//        System.out.println("R: " + Hex.toHexString(R));
         
-//        byte[] randomNumber = ellipticCurve.generateR();
-//        byte[] simetricKey = ellip
-//        byte[] R = 
     }
 }
