@@ -23,11 +23,11 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.63</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.whispersystems/curve25519-java -->
+        <!-- https://mvnrepository.com/artifact/org.zeromq/curve25519-java -->
         <dependency>
-            <groupId>org.whispersystems</groupId>
+            <groupId>org.zeromq</groupId>
             <artifactId>curve25519-java</artifactId>
-            <version>0.5.0</version>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
 </project>
