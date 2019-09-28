@@ -24,7 +24,7 @@ public class ECIES {
     public ECIES() {
         Security.addProvider(new BouncyCastleProvider());
         this.random = new SecureRandom();
-        this.kdf2 = new KDF2BytesGenerator((org.bouncycastle.crypto.Digest) new Digest());
+//        this.kdf2 = new KDF2BytesGenerator((org.bouncycastle.crypto.Digest) new Digest());
     }
     
     /**
