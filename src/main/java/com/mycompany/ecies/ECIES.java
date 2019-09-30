@@ -6,11 +6,7 @@
 package com.mycompany.ecies;
 
 import java.security.SecureRandom;
-import java.security.Security;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
-import org.bouncycastle.crypto.params.KDFParameters;
-import org.bouncycastle.jcajce.provider.digest.MD5.Digest;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  *
@@ -22,7 +18,6 @@ public class ECIES {
     private KDF2BytesGenerator kdf2;
     
     public ECIES() {
-        Security.addProvider(new BouncyCastleProvider());
         this.random = new SecureRandom();
 //        this.kdf2 = new KDF2BytesGenerator((org.bouncycastle.crypto.Digest) new Digest());
     }
@@ -50,4 +45,5 @@ public class ECIES {
 //        return kdf2.generateBytes(iv, 0, KEY_SIZE);
 ////        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
 //    }
+    
  }

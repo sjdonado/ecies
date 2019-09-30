@@ -23,8 +23,7 @@ public class EllipticCurve {
     * @return byte[][]{ byte[] privateKey, byte[] publicKey }
     */
     public byte[][] generateKeyPair() {
-        byte[] privateKey = new byte[ecies.getKeySize()];
-//        ECIES...nextBytes(privateKey);
+        byte[] privateKey = ecies.getRandomNumber();
         byte[] publicKey = new byte[ecies.getKeySize()];
         Curve25519.keygen(publicKey, null, privateKey);
         
