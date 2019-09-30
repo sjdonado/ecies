@@ -33,10 +33,10 @@ public class Main extends javax.swing.JFrame {
 //        byte[] randomNumber = ellipticCurve.getRandomNumber();
 //        byte[] R = ellipticCurve.generateR(randomNumber);
 
-        jLabel11.setText("private key: " + Hex.toHexString(senderKeyPairs[0]));
-        jLabel12.setText("public key: " + Hex.toHexString(senderKeyPairs[1]));
-        jLabel13.setText("IV: " + Hex.toHexString(IV));
-        jLabel14.setText("sharedSecret: " + Hex.toHexString(sharedSecret));
+        jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
+        jLabel12.setText(Hex.toHexString(senderKeyPairs[1]));
+        jLabel13.setText(Hex.toHexString(IV));
+        jLabel14.setText(Hex.toHexString(sharedSecret));
 //        System.out.println("r: " + Hex.toHexString(randomNumber));
 //        System.out.println("R: " + Hex.toHexString(R));
 
@@ -51,6 +51,7 @@ public class Main extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -65,6 +66,9 @@ public class Main extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+
+        jButton1.setText("jButton1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -104,6 +108,14 @@ public class Main extends javax.swing.JFrame {
 
         jLabel14.setText("jLabel14");
 
+        jButton2.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jButton2.setText("Generar");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -137,31 +149,34 @@ public class Main extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 516, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(295, 295, 295)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(304, 304, 304)
                         .addComponent(jLabel2)))
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25)
+                .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel9))
-                .addGap(47, 47, 47)
+                    .addComponent(jLabel9)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(42, 42, 42)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel10))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(jLabel11))
@@ -182,6 +197,23 @@ public class Main extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        ECIES ecies = new ECIES();
+        EllipticCurve ellipticCurve = new EllipticCurve(ecies);
+        byte[][] recipientKeyPairs = ellipticCurve.generateKeyPair();
+         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
+        jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
+        byte[][] senderKeyPairs = ellipticCurve.generateKeyPair();
+        byte[] IV = ecies.getRandomNumber();
+        byte[] sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
+                senderKeyPairs[1]);
+        jLabel11.setText( Hex.toHexString(senderKeyPairs[0]));
+        jLabel12.setText( Hex.toHexString(senderKeyPairs[1]));
+        jLabel13.setText( Hex.toHexString(IV));
+        jLabel14.setText( Hex.toHexString(sharedSecret));
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -220,6 +252,8 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
