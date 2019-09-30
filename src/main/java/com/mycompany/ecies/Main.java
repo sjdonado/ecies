@@ -18,11 +18,6 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();
-        Ejecutar();
-
-    }
-
-    public void Ejecutar() {
         this.setLocationRelativeTo(null);
         ECIES ecies = new ECIES();
         EllipticCurve ellipticCurve = new EllipticCurve(ecies);
@@ -204,7 +199,20 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        Ejecutar();
+        // TODO add your handling code here:
+        ECIES ecies = new ECIES();
+        EllipticCurve ellipticCurve = new EllipticCurve(ecies);
+        byte[][] recipientKeyPairs = ellipticCurve.generateKeyPair();
+         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
+        jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
+        byte[][] senderKeyPairs = ellipticCurve.generateKeyPair();
+        byte[] IV = ecies.getRandomNumber();
+        byte[] sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
+                senderKeyPairs[1]);
+        jLabel11.setText( Hex.toHexString(senderKeyPairs[0]));
+        jLabel12.setText( Hex.toHexString(senderKeyPairs[1]));
+        jLabel13.setText( Hex.toHexString(IV));
+        jLabel14.setText( Hex.toHexString(sharedSecret));
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
