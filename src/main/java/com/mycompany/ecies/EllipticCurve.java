@@ -35,11 +35,11 @@ public class EllipticCurve {
     * @param r byte[]
     * @return byte[]
     */
-    public byte[] generateR(byte[] r) {
-        byte[] R = new byte[ecies.getKeySize()];
-        Curve25519.curve(R, r, null);
-        return R;
-    }
+//    public byte[] generateR(byte[] r) {
+//        byte[] R = new byte[ecies.getKeySize()];
+//        Curve25519.curve(R, r, null);
+//        return R;
+//    }
     
     /**
     *

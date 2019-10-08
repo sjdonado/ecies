@@ -195,10 +195,10 @@ public class Main extends javax.swing.JFrame {
         byte[] IV = ecies.getRandomNumber();
         byte[] sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
                 senderKeyPairs[1]);
-        jLabel11.setText( Hex.toHexString(senderKeyPairs[0]));
-        jLabel12.setText( Hex.toHexString(senderKeyPairs[1]));
-        jLabel13.setText( Hex.toHexString(IV));
-        jLabel14.setText( Hex.toHexString(sharedSecret));
+        jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
+        jLabel12.setText(Hex.toHexString(senderKeyPairs[1]));
+        jLabel13.setText(Hex.toHexString(IV));
+        jLabel14.setText(Hex.toHexString(sharedSecret));
     }
     /**
      * @param args the command line arguments

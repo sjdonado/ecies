@@ -15,7 +15,7 @@ import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 public class ECIES {
     private final int KEY_SIZE = 32;
     private final SecureRandom random;
-    private KDF2BytesGenerator kdf2;
+//    private KDF2BytesGenerator kdf2;
     
     public ECIES() {
         this.random = new SecureRandom();
