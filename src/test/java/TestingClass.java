@@ -11,6 +11,8 @@ import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.macs.HMac;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -45,7 +47,16 @@ public class TestingClass {
             System.out.println("out: " + Hex.toHexString(output));
             int a = kdf2.generateBytes(output, 0, output.length);
             System.out.println("kdf: " + Hex.toHexString(output) + " -> " + a);
-            //-------------------
+            //-------------------HMAC-------------
+            //SHA1Digest sha1 = new SHA1Digest();
+            HMac hmac = new HMac(sha256);
+            byte[] init = new byte[16];
+            System.arraycopy(output, 0, init, 0, 16);
+            hmac.init(new KeyParameter(init));
+            byte[] resBuf = new byte[hmac.getMacSize()];
+            hmac.doFinal(resBuf, 0);
+            System.out.println("hmac: " + Hex.toHexString(resBuf) + " " + resBuf.length);
+            //------------------------------------
             System.out.println(Hex.toHexString(encrypt("Lorem ipsum dolor sit amet amet.".getBytes(),b1,b2)));
         } catch (Exception ex) {
             Logger.getLogger(TestingClass.class.getName()).log(Level.SEVERE, null, ex);

@@ -9,6 +9,9 @@ import java.security.SecureRandom;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  *
@@ -19,14 +22,16 @@ public class ECIES {
     private final SecureRandom random;
     private KDF2BytesGenerator kdf2;
     private SHA256Digest sha256;
-    private KDFParameters param;
+    private KDFParameters kdfParam;
+    private HMac hmac;
     
     public ECIES() {
         this.random = new SecureRandom();
-        sha256 = new SHA256Digest();
+        this.sha256 = new SHA256Digest();
         this.kdf2 = new KDF2BytesGenerator(sha256);
+        this.hmac = new HMac(sha256);
         //param = new KDFParameters(null,null);//iv, SharedSecret
-        kdf2.init(param);
+        //kdf2.init(kdfParam);
     }
     
     /**
@@ -48,10 +53,17 @@ public class ECIES {
     }
     
     public int keyDerivationFunction(byte[] shared, byte[] iv, byte[] output) {
-        param = new KDFParameters(shared, iv);
-        kdf2.init(param);
+        kdfParam = new KDFParameters(shared, iv);
+        kdf2.init(kdfParam);
         return kdf2.generateBytes(output, 0, KEY_SIZE);
 //        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
+    }
+    
+    public byte[] hMacKey(byte[] initValue){
+        hmac.init(new KeyParameter(initValue));
+        byte[] resBuf = new byte[hmac.getMacSize()];
+        hmac.doFinal(resBuf, 0);
+        return resBuf;
     }
     
  }
