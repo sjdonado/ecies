@@ -7,7 +7,10 @@ import org.bouncycastle.crypto.modes.CBCBlockCipher;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -32,7 +35,18 @@ public class TestingClass {
                 (byte)0x9a,(byte)0x0c,(byte)0x74,(byte)0x38,(byte)0xdb,(byte)0xfd,(byte)0x1e,(byte)0x0f};
             byte[] b3 = {(byte)0x18, (byte)0x88, (byte)0xd5, (byte)0xd6, (byte)0x72, (byte)0x58, (byte)0xaa, (byte)0x90,
                 (byte)0x9a,(byte)0x0c,(byte)0x74,(byte)0x38,(byte)0xdb,(byte)0xfd,(byte)0x1e,(byte)0x0f};
-            System.out.println(Hex.toHexString(encrypt(b3,b1,b2)));
+            //--------KDF--------
+            SHA256Digest sha256 = new SHA256Digest();
+            KDF2BytesGenerator kdf2 = new KDF2BytesGenerator(sha256);
+            byte[] iv = b2, sharedSecret = b3;
+            KDFParameters param = new KDFParameters(iv,sharedSecret);
+            kdf2.init(param);
+            byte[] output = new byte[32];
+            System.out.println("out: " + Hex.toHexString(output));
+            int a = kdf2.generateBytes(output, 0, output.length);
+            System.out.println("kdf: " + Hex.toHexString(output) + " -> " + a);
+            //-------------------
+            System.out.println(Hex.toHexString(encrypt("Lorem ipsum dolor sit amet amet.".getBytes(),b1,b2)));
         } catch (Exception ex) {
             Logger.getLogger(TestingClass.class.getName()).log(Level.SEVERE, null, ex);
         }

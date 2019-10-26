@@ -7,6 +7,8 @@ package com.mycompany.ecies;
 
 import java.security.SecureRandom;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
+import org.bouncycastle.crypto.params.KDFParameters;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 
 /**
  *
@@ -15,11 +17,16 @@ import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 public class ECIES {
     private final int KEY_SIZE = 32;
     private final SecureRandom random;
-//    private KDF2BytesGenerator kdf2;
+    private KDF2BytesGenerator kdf2;
+    private SHA256Digest sha256;
+    private KDFParameters param;
     
     public ECIES() {
         this.random = new SecureRandom();
-//        this.kdf2 = new KDF2BytesGenerator((org.bouncycastle.crypto.Digest) new Digest());
+        sha256 = new SHA256Digest();
+        this.kdf2 = new KDF2BytesGenerator(sha256);
+        //param = new KDFParameters(null,null);//iv, SharedSecret
+        kdf2.init(param);
     }
     
     /**
@@ -40,10 +47,11 @@ public class ECIES {
         return KEY_SIZE;
     }
     
-//    public int keyDerivationFunction(byte[] shared, byte[] iv) {
-//        kdf2.init(new KDFParameters(shared, iv));
-//        return kdf2.generateBytes(iv, 0, KEY_SIZE);
-////        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
-//    }
+    public int keyDerivationFunction(byte[] shared, byte[] iv, byte[] output) {
+        param = new KDFParameters(shared, iv);
+        kdf2.init(param);
+        return kdf2.generateBytes(output, 0, KEY_SIZE);
+//        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
+    }
     
  }
