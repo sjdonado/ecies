@@ -203,17 +203,19 @@ public class Main extends javax.swing.JFrame {
         jLabel12.setText(Hex.toHexString(senderKeyPairs[1]));
         jLabel13.setText(Hex.toHexString(IV));
         jLabel14.setText(Hex.toHexString(sharedSecret));
+    }
+    
+    private byte[] cipher(String plainText){
         byte[] iv = new byte[16];
         System.arraycopy(IV, 0, iv, 0, 16);
-        byte[] c = ecies.encrypt(sharedSecret, iv, "lorem ipsum".getBytes());
-        System.out.println(c.length);
-        System.out.println(Hex.toHexString(c));
-        c = ecies.encrypt(sharedSecret, iv, "Lorem ipsum dolor sit amet orci aliquam.".getBytes());
-        System.out.println(c.length);
-        System.out.println(Hex.toHexString(c));
-        c = ecies.encrypt(sharedSecret, iv, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In tempus congue metus.".getBytes());
-        System.out.println(c.length);
-        System.out.println(Hex.toHexString(c));
+        byte[] c = ecies.encrypt(sharedSecret, iv, plainText.getBytes());
+        byte[] cipherText = new byte[senderKeyPairs[1].length + c.length];
+        System.arraycopy(senderKeyPairs[1], 0, cipherText, 0, senderKeyPairs[1].length);
+        System.arraycopy(c, 0, cipherText, senderKeyPairs[1].length, c.length);
+        /*System.out.println("public key length" +senderKeyPairs[1].length);
+        System.out.println(Hex.toHexString(c) + "; " + c.length);
+        System.out.println("CipherText " + Hex.toHexString(cipherText) + "; " + cipherText.length);*/
+        return cipherText;
     }
     /**
      * @param args the command line arguments
