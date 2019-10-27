@@ -14,6 +14,10 @@ import org.bouncycastle.util.encoders.Hex;
 public class Main extends javax.swing.JFrame {
     
     private final ECIES ecies;
+    byte[][] recipientKeyPairs;
+    byte[][] senderKeyPairs;
+    byte[] IV;
+    byte[] sharedSecret;
 
     /**
      * Creates new form Vista
@@ -188,17 +192,28 @@ public class Main extends javax.swing.JFrame {
 
     private void generateKeys() {
         EllipticCurve ellipticCurve = new EllipticCurve(ecies);
-        byte[][] recipientKeyPairs = ellipticCurve.generateKeyPair();
-         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
+        recipientKeyPairs = ellipticCurve.generateKeyPair();
+        jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
         jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
-        byte[][] senderKeyPairs = ellipticCurve.generateKeyPair();
-        byte[] IV = ecies.getRandomNumber();
-        byte[] sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
+        senderKeyPairs = ellipticCurve.generateKeyPair();
+        IV = ecies.getRandomNumber();
+        sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
                 senderKeyPairs[1]);
         jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
         jLabel12.setText(Hex.toHexString(senderKeyPairs[1]));
         jLabel13.setText(Hex.toHexString(IV));
         jLabel14.setText(Hex.toHexString(sharedSecret));
+        byte[] iv = new byte[16];
+        System.arraycopy(IV, 0, iv, 0, 16);
+        byte[] c = ecies.encrypt(sharedSecret, iv, "lorem ipsum".getBytes());
+        System.out.println(c.length);
+        System.out.println(Hex.toHexString(c));
+        c = ecies.encrypt(sharedSecret, iv, "Lorem ipsum dolor sit amet orci aliquam.".getBytes());
+        System.out.println(c.length);
+        System.out.println(Hex.toHexString(c));
+        c = ecies.encrypt(sharedSecret, iv, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In tempus congue metus.".getBytes());
+        System.out.println(c.length);
+        System.out.println(Hex.toHexString(c));
     }
     /**
      * @param args the command line arguments
