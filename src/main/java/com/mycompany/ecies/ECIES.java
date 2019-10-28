@@ -57,8 +57,8 @@ public class ECIES {
         return KEY_SIZE;
     }
     
-    public int keyDerivationFunction(byte[] shared, byte[] iv, byte[] output) {
-        kdfParam = new KDFParameters(shared, iv);
+    public int keyDerivationFunction(byte[] key, byte[] iv, byte[] output) {
+        kdfParam = new KDFParameters(key, iv);
         kdf2.init(kdfParam);
         return kdf2.generateBytes(output, 0, KEY_SIZE);
 //        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
@@ -81,12 +81,13 @@ public class ECIES {
     public byte[] encrypt(byte[] encryptionPoint, byte[] iv, byte[] plainText){
         try {
             byte[] output = new byte[KEY_SIZE];
+            System.out.println("encrypt: " + Hex.toHexString(encryptionPoint) + " iv: " + Hex.toHexString(iv));
             int size = keyDerivationFunction(encryptionPoint, iv, output);
             byte[] kMac = new byte[size / 2];
             byte[] kEnc = new byte[size / 2];
             System.arraycopy(output, 0, kMac, 0, size / 2);
             System.arraycopy(output, size/2 -1, kEnc, 0, size / 2);
-            System.out.println("kEnc 1: " + Hex.toHexString(kEnc));
+            System.out.println("encrypt kEnc: " + Hex.toHexString(kEnc));
             
             byte[] tag = hMacKey(kMac);
             System.out.println("p: "+plainText.length + " iv:" + iv.length);
@@ -105,10 +106,12 @@ public class ECIES {
     public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
         try {
             byte[] output = new byte[KEY_SIZE];
+            System.out.println("decryptionPoint: " + Hex.toHexString(decryptionPoint) + " iv: " + Hex.toHexString(iv));
+
             int size = keyDerivationFunction(decryptionPoint, iv, output);
             byte[] kEnc = new byte[size / 2];
             System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
-            System.out.println("kEnc 2: " + Hex.toHexString(kEnc));
+            System.out.println("decrypt kEnc: " + Hex.toHexString(kEnc));
             return cipher.decrypt(chiperText, kEnc, iv);
         } catch (Exception ex) {
             Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);

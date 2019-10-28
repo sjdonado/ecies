@@ -43,13 +43,13 @@ public class EllipticCurve {
     
     /**
     *
-    * @param R byte[]
+    * @param r byte[]
     * @param publicKey byte[]
     * @return byte[]
     */
-    public byte[] encryptionPoint(byte[] R, byte[] publicKey) {
+    public byte[] encryptionPoint(byte[] r, byte[] publicKey) {
         byte[] Z = new byte[ecies.getKeySize()];
-        Curve25519.curve(Z, R, publicKey);
+        Curve25519.curve(Z, r, publicKey);
         return Z;
     }
     
