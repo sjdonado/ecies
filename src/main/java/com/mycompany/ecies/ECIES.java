@@ -22,20 +22,11 @@ import org.bouncycastle.util.encoders.Hex;
 public class ECIES {
     private final int KEY_SIZE = 32;
     private final SecureRandom random;
-    private KDF2BytesGenerator kdf2;
-    private SHA256Digest sha256;
-    private KDFParameters kdfParam;
-    private HMac hmac;
-    private Cipher cipher;
+    private final Cipher cipher;
     
     public ECIES() {
         this.random = new SecureRandom();
-        this.sha256 = new SHA256Digest();
-        this.kdf2 = new KDF2BytesGenerator(sha256);
-        this.hmac = new HMac(sha256);
         this.cipher = new Cipher();
-        //param = new KDFParameters(null,null);//iv, SharedSecret
-        //kdf2.init(kdfParam);
     }
     
     /**
@@ -58,13 +49,16 @@ public class ECIES {
     }
     
     public int keyDerivationFunction(byte[] key, byte[] iv, byte[] output) {
-        kdfParam = new KDFParameters(key, iv);
-        kdf2.init(kdfParam);
-        return kdf2.generateBytes(output, 0, KEY_SIZE);
+        KDF2BytesGenerator kdf2 = new KDF2BytesGenerator(new SHA256Digest());
+        kdf2.init(new KDFParameters(key, iv));
+        int size = kdf2.generateBytes(output, 0, KEY_SIZE);
+        System.out.println("output: " + Hex.toHexString(output));
+        return size;
 //        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
     }
     
     public byte[] hMacKey(byte[] initValue){
+        HMac hmac = new HMac(new SHA256Digest());
         hmac.init(new KeyParameter(initValue));
         byte[] resBuf = new byte[hmac.getMacSize()];
         hmac.doFinal(resBuf, 0);
@@ -81,19 +75,15 @@ public class ECIES {
     public byte[] encrypt(byte[] encryptionPoint, byte[] iv, byte[] plainText){
         try {
             byte[] output = new byte[KEY_SIZE];
-            System.out.println("encrypt: " + Hex.toHexString(encryptionPoint) + " iv: " + Hex.toHexString(iv));
             int size = keyDerivationFunction(encryptionPoint, iv, output);
             byte[] kMac = new byte[size / 2];
             byte[] kEnc = new byte[size / 2];
             System.arraycopy(output, 0, kMac, 0, size / 2);
             System.arraycopy(output, size/2 -1, kEnc, 0, size / 2);
-            System.out.println("encrypt kEnc: " + Hex.toHexString(kEnc));
             
             byte[] tag = hMacKey(kMac);
-            System.out.println("p: "+plainText.length + " iv:" + iv.length);
             byte[] cipherText = cipher.encrypt(plainText, kEnc, iv);
             byte[] res = new byte[tag.length + cipherText.length];
-            System.out.println("cipherText 1: " + Hex.toHexString(cipherText));
             System.arraycopy(tag, 0, res, 0, tag.length);
             System.arraycopy(cipherText, 0, res, tag.length, cipherText.length);
             return res;
@@ -106,12 +96,9 @@ public class ECIES {
     public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
         try {
             byte[] output = new byte[KEY_SIZE];
-            System.out.println("decryptionPoint: " + Hex.toHexString(decryptionPoint) + " iv: " + Hex.toHexString(iv));
-
             int size = keyDerivationFunction(decryptionPoint, iv, output);
             byte[] kEnc = new byte[size / 2];
             System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
-            System.out.println("decrypt kEnc: " + Hex.toHexString(kEnc));
             return cipher.decrypt(chiperText, kEnc, iv);
         } catch (Exception ex) {
             Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
