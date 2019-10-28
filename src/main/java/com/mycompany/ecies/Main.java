@@ -295,7 +295,8 @@ public class Main extends javax.swing.JFrame {
         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
         jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
         senderKeyPairs = ellipticCurve.generateKeyPair();
-        IV = ecies.getRandomNumber();
+        IV = new byte[16];
+        System.arraycopy(ecies.getRandomNumber(), 0, IV, 0, 16);
         sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
                 senderKeyPairs[1]);
         jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
@@ -305,9 +306,7 @@ public class Main extends javax.swing.JFrame {
     }
     
     private void cipher(String plainText){
-        byte[] iv = new byte[16];
-        System.arraycopy(IV, 0, iv, 0, 16);
-        byte[] c = ecies.encrypt(sharedSecret, iv, plainText.getBytes());
+        byte[] c = ecies.encrypt(sharedSecret, IV, plainText.getBytes());
         byte[] cipherText = new byte[senderKeyPairs[1].length + c.length];
         System.arraycopy(senderKeyPairs[1], 0, cipherText, 0, senderKeyPairs[1].length);
         System.arraycopy(c, 0, cipherText, senderKeyPairs[1].length, c.length);

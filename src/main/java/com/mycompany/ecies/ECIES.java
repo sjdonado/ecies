@@ -76,13 +76,6 @@ public class ECIES {
     public Cipher getCipher() {
         return cipher;
     }
-
-    /**
-     * @param cipher the cipher to set
-     */
-    public void setCipher(Cipher cipher) {
-        this.cipher = cipher;
-    }
     
     public byte[] encrypt(byte[] sharedSecret, byte[] iv, byte[] plainText){
         try {
