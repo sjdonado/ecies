@@ -23,7 +23,7 @@ public class EllipticCurve {
     * @return byte[][]{ byte[] privateKey, byte[] publicKey }
     */
     public byte[][] generateKeyPair() {
-        byte[] privateKey = ecies.getRandomNumber();
+        byte[] privateKey = ecies.getRandomNumber(ecies.getKeySize());
         byte[] publicKey = new byte[ecies.getKeySize()];
         Curve25519.keygen(publicKey, null, privateKey);
         
@@ -35,21 +35,33 @@ public class EllipticCurve {
     * @param r byte[]
     * @return byte[]
     */
-//    public byte[] generateR(byte[] r) {
-//        byte[] R = new byte[ecies.getKeySize()];
-//        Curve25519.curve(R, r, null);
-//        return R;
-//    }
+    public byte[] generateR(byte[] r) {
+        byte[] R = new byte[r.length];
+        Curve25519.curve(R, r, null);
+        return R;
+    }
     
     /**
     *
-    * @param publickey byte[]
+    * @param R byte[]
+    * @param publicKey byte[]
+    * @return byte[]
+    */
+    public byte[] encryptionPoint(byte[] R, byte[] publicKey) {
+        byte[] Z = new byte[ecies.getKeySize()];
+        Curve25519.curve(Z, R, publicKey);
+        return Z;
+    }
+    
+    /**
+    *
+    * @param R byte[]
     * @param privateKey byte[]
     * @return byte[]
     */
-    public byte[] getSharedKey(byte[] publickey, byte[] privateKey) {
+    public byte[] decryptionPoint(byte[] R, byte[] privateKey) {
         byte[] Z = new byte[ecies.getKeySize()];
-        Curve25519.curve(Z, privateKey, publickey);
+        Curve25519.curve(Z, privateKey, R);
         return Z;
     }
 }

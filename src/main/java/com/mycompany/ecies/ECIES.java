@@ -40,10 +40,11 @@ public class ECIES {
     
     /**
     *
+    * @param keySize int
     * @return byte[]
     */
-    public byte[] getRandomNumber() {
-        byte[] r = new byte[KEY_SIZE];
+    public byte[] getRandomNumber(int keySize) {
+        byte[] r = new byte[keySize];
         random.nextBytes(r);
         return r;
     }
@@ -77,21 +78,38 @@ public class ECIES {
         return cipher;
     }
     
-    public byte[] encrypt(byte[] sharedSecret, byte[] iv, byte[] plainText){
+    public byte[] encrypt(byte[] encryptionPoint, byte[] iv, byte[] plainText){
         try {
-            byte[] output = new byte[32];
-            int size = keyDerivationFunction(sharedSecret,iv,output);
-            byte[] kMac = new byte[size/2];
-            byte[] kEnc = new byte[size/2];
-            System.arraycopy(output, 0, kMac, 0, size/2);
-            System.arraycopy(output, size/2 -1, kEnc, 0, size/2);
+            byte[] output = new byte[KEY_SIZE];
+            int size = keyDerivationFunction(encryptionPoint, iv, output);
+            byte[] kMac = new byte[size / 2];
+            byte[] kEnc = new byte[size / 2];
+            System.arraycopy(output, 0, kMac, 0, size / 2);
+            System.arraycopy(output, size/2 -1, kEnc, 0, size / 2);
+            System.out.println("kEnc 1: " + Hex.toHexString(kEnc));
+            
             byte[] tag = hMacKey(kMac);
             System.out.println("p: "+plainText.length + " iv:" + iv.length);
             byte[] cipherText = cipher.encrypt(plainText, kEnc, iv);
             byte[] res = new byte[tag.length + cipherText.length];
+            System.out.println("cipherText 1: " + Hex.toHexString(cipherText));
             System.arraycopy(tag, 0, res, 0, tag.length);
             System.arraycopy(cipherText, 0, res, tag.length, cipherText.length);
             return res;
+        } catch (Exception ex) {
+            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
+        try {
+            byte[] output = new byte[KEY_SIZE];
+            int size = keyDerivationFunction(decryptionPoint, iv, output);
+            byte[] kEnc = new byte[size / 2];
+            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
+            System.out.println("kEnc 2: " + Hex.toHexString(kEnc));
+            return cipher.decrypt(chiperText, kEnc, iv);
         } catch (Exception ex) {
             Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
         }

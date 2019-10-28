@@ -14,10 +14,13 @@ import org.bouncycastle.util.encoders.Hex;
 public class Main extends javax.swing.JFrame {
     
     private final ECIES ecies;
+    EllipticCurve ellipticCurve;
     byte[][] recipientKeyPairs;
     byte[][] senderKeyPairs;
+    byte[] r;
+    byte[] R;
     byte[] IV;
-    byte[] sharedSecret;
+    byte[] encryptionPoint;
 
     /**
      * Creates new form Vista
@@ -107,7 +110,7 @@ public class Main extends javax.swing.JFrame {
         jLabel7.setText("IV :");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabel8.setText("SharedSecret :");
+        jLabel8.setText("R:");
 
         jLabel9.setText("jLabel9");
 
@@ -239,7 +242,7 @@ public class Main extends javax.swing.JFrame {
                                 .addComponent(jLabel16)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton1)))
                         .addGap(20, 20, 20))))
         );
@@ -290,30 +293,43 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void generateKeys() {
-        EllipticCurve ellipticCurve = new EllipticCurve(ecies);
+        ellipticCurve = new EllipticCurve(ecies);
         recipientKeyPairs = ellipticCurve.generateKeyPair();
         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
         jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
         senderKeyPairs = ellipticCurve.generateKeyPair();
-        IV = new byte[16];
-        System.arraycopy(ecies.getRandomNumber(), 0, IV, 0, 16);
-        sharedSecret = ellipticCurve.getSharedKey(recipientKeyPairs[0],
-                senderKeyPairs[1]);
+        IV = ecies.getRandomNumber(16);
+        r = ecies.getRandomNumber(ecies.getKeySize());
+        R = ellipticCurve.generateR(r);
         jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
         jLabel12.setText(Hex.toHexString(senderKeyPairs[1]));
         jLabel13.setText(Hex.toHexString(IV));
-        jLabel14.setText(Hex.toHexString(sharedSecret));
+        jLabel14.setText(Hex.toHexString(R));
     }
     
     private void cipher(String plainText){
-        byte[] c = ecies.encrypt(sharedSecret, IV, plainText.getBytes());
-        byte[] cipherText = new byte[senderKeyPairs[1].length + c.length];
-        System.arraycopy(senderKeyPairs[1], 0, cipherText, 0, senderKeyPairs[1].length);
-        System.arraycopy(c, 0, cipherText, senderKeyPairs[1].length, c.length);
+        encryptionPoint = ellipticCurve.encryptionPoint(r, senderKeyPairs[1]);
+        System.out.println("encryptionPoint 1: " + Hex.toHexString(encryptionPoint));
+        byte[] c = ecies.encrypt(encryptionPoint, IV, plainText.getBytes());
+        byte[] cipherText = new byte[R.length + c.length];
+        System.arraycopy(R, 0, cipherText, 0, R.length);
+        System.arraycopy(c, 0, cipherText, R.length, c.length);
         /*System.out.println("public key length" +senderKeyPairs[1].length);
         System.out.println(Hex.toHexString(c) + "; " + c.length);
         System.out.println("CipherText " + Hex.toHexString(cipherText) + "; " + cipherText.length);*/
         jTextArea1.setText(Hex.toHexString(cipherText));
+        
+        byte[] receiverR = new byte[ecies.getKeySize()];
+        System.arraycopy(cipherText, 0, receiverR, 0, ecies.getKeySize());
+        byte[] receiverChiperText = new byte[cipherText.length-(receiverR.length + ecies.getKeySize())];
+        System.arraycopy(cipherText, R.length + ecies.getKeySize(), receiverChiperText, 0, cipherText.length - (receiverR.length + ecies.getKeySize()));
+        byte[] receiverTag = new byte[ecies.getKeySize()];
+        System.arraycopy(cipherText, ecies.getKeySize(), receiverTag, 0, ecies.getKeySize());
+
+        byte[] decryptionPoint = ellipticCurve.decryptionPoint(receiverR, senderKeyPairs[0]);
+
+        byte[] res = ecies.decrypt(decryptionPoint, IV, receiverChiperText);
+        System.out.println("DECRYPTION: " + new String(res));
     }
     /**
      * @param args the command line arguments
