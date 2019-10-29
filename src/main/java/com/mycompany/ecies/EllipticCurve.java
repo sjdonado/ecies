@@ -59,9 +59,9 @@ public class EllipticCurve {
     * @param privateKey byte[]
     * @return byte[]
     */
-    public byte[] decryptionPoint(byte[] R, byte[] privateKey) {
-        byte[] Z = new byte[ecies.getKeySize()];
-        Curve25519.curve(Z, privateKey, R);
-        return Z;
-    }
+//    public byte[] decryptionPoint(byte[] R, byte[] privateKey) {
+//        byte[] Z = new byte[ecies.getKeySize()];
+//        Curve25519.curve(Z, privateKey, R);
+//        return Z;
+//    }
 }

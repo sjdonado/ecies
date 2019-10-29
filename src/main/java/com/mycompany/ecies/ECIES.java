@@ -57,9 +57,12 @@ public class ECIES {
 //        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
     }
     
-    public byte[] hMacKey(byte[] initValue){
+    public byte[] hMacKey(byte[] initValue,byte[] plainText){
         HMac hmac = new HMac(new SHA256Digest());
         hmac.init(new KeyParameter(initValue));
+        byte[] res = new byte[plainText.length];
+        System.arraycopy(plainText,0,res,0,res.length);
+        hmac.update(res, 0, res.length);
         byte[] resBuf = new byte[hmac.getMacSize()];
         hmac.doFinal(resBuf, 0);
         return resBuf;
@@ -81,7 +84,7 @@ public class ECIES {
             System.arraycopy(output, 0, kMac, 0, size / 2);
             System.arraycopy(output, size/2 -1, kEnc, 0, size / 2);
             
-            byte[] tag = hMacKey(kMac);
+            byte[] tag = hMacKey(kMac,plainText);
             byte[] cipherText = cipher.encrypt(plainText, kEnc, iv);
             byte[] res = new byte[tag.length + cipherText.length];
             System.arraycopy(tag, 0, res, 0, tag.length);
@@ -93,16 +96,16 @@ public class ECIES {
         return null;
     }
     
-    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
-        try {
-            byte[] output = new byte[KEY_SIZE];
-            int size = keyDerivationFunction(decryptionPoint, iv, output);
-            byte[] kEnc = new byte[size / 2];
-            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
-            return cipher.decrypt(chiperText, kEnc, iv);
-        } catch (Exception ex) {
-            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
+//    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
+//        try {
+//            byte[] output = new byte[KEY_SIZE];
+//            int size = keyDerivationFunction(decryptionPoint, iv, output);
+//            byte[] kEnc = new byte[size / 2];
+//            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
+//            return cipher.decrypt(chiperText, kEnc, iv);
+//        } catch (Exception ex) {
+//            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return null;
+//    }
  }
