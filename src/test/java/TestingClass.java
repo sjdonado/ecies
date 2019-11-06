@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bouncycastle.crypto.CipherParameters;
@@ -57,6 +58,14 @@ public class TestingClass {
             hmac.doFinal(resBuf, 0);
             System.out.println("hmac: " + Hex.toHexString(resBuf) + " " + resBuf.length);
             //------------------------------------
+            byte[] o1 = { 0x00,0x10};
+            byte[] o2 = { 0x00,0x10};
+            
+            if (Arrays.equals(o1, o2)) {
+                System.out.println("o1 and o2 are EQUALS");
+            }else{
+                System.out.println("o1 and o2 are NOT EQUALS");
+            }
             System.out.println(Hex.toHexString(encrypt("Lorem ipsum dolor sit amet amet.".getBytes(),b1,b2)));
         } catch (Exception ex) {
             Logger.getLogger(TestingClass.class.getName()).log(Level.SEVERE, null, ex);

@@ -6,6 +6,7 @@
 package com.mycompany.ecies;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
@@ -52,7 +53,7 @@ public class ECIES {
         KDF2BytesGenerator kdf2 = new KDF2BytesGenerator(new SHA256Digest());
         kdf2.init(new KDFParameters(key, iv));
         int size = kdf2.generateBytes(output, 0, KEY_SIZE);
-        System.out.println("output: " + Hex.toHexString(output));
+        //System.out.println("output: " + Hex.toHexString(output));
         return size;
 //        kdf2.generateBytes(bytes, KEY_SIZE, KEY_SIZE)
     }
@@ -96,16 +97,25 @@ public class ECIES {
         return null;
     }
     
-//    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText){
-//        try {
-//            byte[] output = new byte[KEY_SIZE];
-//            int size = keyDerivationFunction(decryptionPoint, iv, output);
-//            byte[] kEnc = new byte[size / 2];
-//            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
-//            return cipher.decrypt(chiperText, kEnc, iv);
-//        } catch (Exception ex) {
-//            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return null;
-//    }
+    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText, byte[] cTag){
+        try {
+            byte[] output = new byte[KEY_SIZE];
+            int size = keyDerivationFunction(decryptionPoint, iv, output);
+            byte[] kMac = new byte[size / 2];
+            byte[] kEnc = new byte[size / 2];
+            System.arraycopy(output, 0, kMac, 0, size / 2);
+            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
+            byte[] res = cipher.decrypt(chiperText, kEnc, iv);
+            
+            byte[] pTag = hMacKey(kMac,res);
+            if (Arrays.equals(pTag, cTag)) {
+                return res;
+            }else{
+                System.out.println("Tags are not the same, possible data corruption.");
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
  }

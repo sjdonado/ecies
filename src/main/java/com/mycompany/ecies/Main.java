@@ -19,7 +19,8 @@ public class Main extends javax.swing.JFrame {
     byte[][] senderKeyPairs;
     byte[] r;
     byte[] R;
-    byte[] IV;
+    byte[] IV = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     byte[] encryptionPoint;
 
     /**
@@ -297,7 +298,7 @@ public class Main extends javax.swing.JFrame {
         jLabel9.setText(Hex.toHexString(recipientKeyPairs[0]));
         jLabel10.setText(Hex.toHexString(recipientKeyPairs[1]));
         senderKeyPairs = ellipticCurve.generateKeyPair();
-        IV = ecies.getRandomNumber(16);
+        //IV = ecies.getRandomNumber(16);
         r = ecies.getRandomNumber(ecies.getKeySize());
         R = ellipticCurve.generateR(r);
         jLabel11.setText(Hex.toHexString(senderKeyPairs[0]));
@@ -317,21 +318,21 @@ public class Main extends javax.swing.JFrame {
         System.out.println("CipherText " + Hex.toHexString(cipherText) + "; " + cipherText.length);*/
         jTextArea1.setText(Hex.toHexString(cipherText));
         
-        //decrypt(cipherText);
+        decrypt(cipherText);
     }
     
-//    private void decrypt(byte[] cipherText) {
-//        byte[] receiverR = new byte[ecies.getKeySize()];
-//        System.arraycopy(cipherText, 0, receiverR, 0, ecies.getKeySize());
-//        byte[] receiverChiperText = new byte[cipherText.length - (receiverR.length + ecies.getKeySize())];
-//        System.arraycopy(cipherText, R.length + ecies.getKeySize(), receiverChiperText, 0, cipherText.length - (receiverR.length + ecies.getKeySize()));
-//        byte[] receiverTag = new byte[ecies.getKeySize()];
-//        System.arraycopy(cipherText, ecies.getKeySize(), receiverTag, 0, ecies.getKeySize());
-//
-//        byte[] decryptionPoint = ellipticCurve.decryptionPoint(receiverR, senderKeyPairs[0]);
-//        byte[] res = ecies.decrypt(decryptionPoint, IV, receiverChiperText);
-//        System.out.println("DECRYPTION: " + new String(res)); 
-//    }
+    private void decrypt(byte[] cipherText) {
+        byte[] receiverR = new byte[ecies.getKeySize()];
+        System.arraycopy(cipherText, 0, receiverR, 0, ecies.getKeySize());
+        byte[] receiverChiperText = new byte[cipherText.length - (receiverR.length + ecies.getKeySize())];
+        System.arraycopy(cipherText, R.length + ecies.getKeySize(), receiverChiperText, 0, cipherText.length - (receiverR.length + ecies.getKeySize()));
+        byte[] receiverTag = new byte[ecies.getKeySize()];
+        System.arraycopy(cipherText, ecies.getKeySize(), receiverTag, 0, ecies.getKeySize());
+        
+        byte[] decryptionPoint = ellipticCurve.decryptionPoint(receiverR, senderKeyPairs[0]);
+        byte[] res = ecies.decrypt(decryptionPoint, IV, receiverChiperText, receiverTag);
+        System.out.println("DECRYPTION: " + new String(res)); 
+    }
     /**
      * @param args the command line arguments
      */
