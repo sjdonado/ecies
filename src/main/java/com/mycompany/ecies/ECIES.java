@@ -14,7 +14,6 @@ import org.bouncycastle.crypto.params.KDFParameters;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  *
@@ -97,25 +96,19 @@ public class ECIES {
         return null;
     }
     
-    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText, byte[] cTag){
-        try {
-            byte[] output = new byte[KEY_SIZE];
-            int size = keyDerivationFunction(decryptionPoint, iv, output);
-            byte[] kMac = new byte[size / 2];
-            byte[] kEnc = new byte[size / 2];
-            System.arraycopy(output, 0, kMac, 0, size / 2);
-            System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
-            byte[] res = cipher.decrypt(chiperText, kEnc, iv);
-            
-            byte[] pTag = hMacKey(kMac,res);
-            if (Arrays.equals(pTag, cTag)) {
-                return res;
-            }else{
-                System.out.println("Tags are not the same, possible data corruption.");
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(ECIES.class.getName()).log(Level.SEVERE, null, ex);
+    public byte[] decrypt(byte[] decryptionPoint, byte[] iv, byte[] chiperText, byte[] cTag) throws Exception {
+        byte[] output = new byte[KEY_SIZE];
+        int size = keyDerivationFunction(decryptionPoint, iv, output);
+        byte[] kMac = new byte[size / 2];
+        byte[] kEnc = new byte[size / 2];
+        System.arraycopy(output, 0, kMac, 0, size / 2);
+        System.arraycopy(output, size / 2 - 1, kEnc, 0, size / 2);
+        byte[] res = cipher.decrypt(chiperText, kEnc, iv);
+
+        byte[] pTag = hMacKey(kMac,res);
+        if (!Arrays.equals(pTag, cTag)) {
+            throw new Exception("Tags are not the same, possible data corruption.");
         }
-        return null;
+        return res;
     }
  }

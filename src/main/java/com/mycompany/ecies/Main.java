@@ -273,6 +273,9 @@ public class Main extends javax.swing.JFrame {
     private void recipientDecryptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recipientDecryptButtonActionPerformed
         try {
             byte[] cipherText = Hex.decode(recipientCipherTextArea.getText());
+//            byte[] test = cipherText.clone();
+//            test[test.length - 1] = (byte) (~test[test.length - 1] & 0xFF);
+//            System.out.println("Test: " + Hex.toHexString(test));
 
             byte[] receiverR = new byte[ecies.getKeySize()];
             System.arraycopy(cipherText, 0, receiverR, 0, ecies.getKeySize());
@@ -288,8 +291,7 @@ public class Main extends javax.swing.JFrame {
 
             recipientDecryptionResultTextArea.setText(new String(plainText));
         } catch (Exception ex) {
-            System.out.println(ex);
-            recipientDecryptionResultTextArea.setText("Error, try again");
+            recipientDecryptionResultTextArea.setText(ex.getMessage());
         }
     }//GEN-LAST:event_recipientDecryptButtonActionPerformed
 
